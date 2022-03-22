@@ -76,7 +76,7 @@ git clone --bare https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper.git
 ```
 
-### Setup upstreams
+### Setup fetchs to remote
 
 ```sh
 git config --local remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
