@@ -10,9 +10,10 @@ create, switch and delete worktrees by using only widely known commands.
   - [Usage](#usage)
     - [Configure default editor](#configure-default-editor)
     - [Clone a bare repository](#clone-a-bare-repository)
-    - [Setup upstreams](#setup-upstreams)
-    - [Open an existing branch/worktree](#open-an-existing-branchworktree)
+    - [Setup fetch to remote](#setup-fetch-to-remote)
+    - [Create initial worktree](#create-initial-worktree)
     - [Create a new branch/worktree](#create-a-new-branchworktree)
+    - [Open an existing worktree](#open-an-existing-worktree)
     - [Delete a branch/worktree](#delete-a-branchworktree)
 
 ## Installation
@@ -35,6 +36,7 @@ Install [my modified fork of complete_alias](https://github.com/lu0/complete-ali
 ```sh
 sudo apt install bash-completion
 git clone https://github.com/lu0/complete-alias
+cd complete-alias/
 echo ". $PWD/complete_alias" >> ~/.bash_completion
 ```
 
@@ -76,19 +78,17 @@ git clone --bare https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper.git
 ```
 
-### Setup fetchs to remote
+### Setup fetch to remote
 
 ```sh
 git config --local remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+git fetch
 ```
 
-### Open an existing branch/worktree
-
-This can be executed even if the current directory is the root of the bare
-repository.
+### Create initial worktree
 
 ```sh
-git checkout master
+git checkout -B $(git branch --show-current)
 ```
 
 ### Create a new branch/worktree
@@ -97,7 +97,15 @@ git checkout master
 git checkout [-b|-B] another_branch
 ```
 
+### Open an existing worktree
+
+```sh
+git checkout master
+```
+
 ### Delete a branch/worktree
+
+This will remove both the branch and the worktree.
 
 ```sh
 git branch [-d|-D] another_branch
