@@ -44,6 +44,10 @@ if [[ "${override_switch_cmds}" = 0 ]] && [[ "${override_branch_cmds}" = 0 ]]; t
     clean_env && return 1
 fi
 
+show() {
+    echo -e >&2 "git-worktree-wrapper:\n  ${1}"
+}
+
 if [[ "${override_switch_cmds}" = 1 ]]; then
 
     if [[ "$2" == "-b" || "$2" == "-B" ]]; then
@@ -66,7 +70,7 @@ if [[ "${override_switch_cmds}" = 1 ]]; then
         cd ${bare_dir}
 
         cmd="git_ $@"
-        echo "Executing \`${cmd}\`"
+        show "Executing vanilla command:\n\t${cmd}"
         eval ${cmd}
 
 
@@ -95,11 +99,11 @@ if [[ "${override_switch_cmds}" = 1 ]]; then
             if [[ $(git_ worktree list | grep -w "\[${to}\]") ]]; then
 
                 cmd="cd ${bare_dir}/${to_dir} && [[ ${NO_GIT_WORKTREE_EDITOR} != 1 ]] && ${EDITOR} ."
-                echo "Executing \`${cmd}\`"
+                show "Executing vanilla command:\n\t${cmd}"
                 eval ${cmd}
 
             else
-                echo "Worktree ${to_dir} does not exist."
+                show "Worktree ${to_dir} does not exist."
                 cd -
             fi
         fi
@@ -124,7 +128,7 @@ elif [[ "${override_branch_cmds}" = 1 ]]; then
         # Run from bare repo's dir
         cd ${bare_dir}
 
-        echo "Executing \`${cmd}\`"
+        show "Executing vanilla command:\n\t${cmd}"
         eval ${cmd}
 
     fi
@@ -134,4 +138,5 @@ elif [[ "${override_branch_cmds}" = 1 ]]; then
 
 fi
 
+show "Last checked out branch: $(cat ${bare_dir}/.currentbranch)"
 clean_env && return 0
