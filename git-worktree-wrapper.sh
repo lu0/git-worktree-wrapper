@@ -30,7 +30,7 @@ if [[ "${is_bare}" = false ]] || [[ ${is_git_repo} = 0 ]]; then
     clean_env && return 1
 fi
 
-bare_dir=$(git_ worktree list | grep -w \(bare\) | cut -d" " -f1)
+bare_dir=$(git_ worktree list | head -1 | cut -d" " -f1)
 
 git_switch_cmds=("checkout switch")
 override_switch_cmds=$(echo ${git_switch_cmds[@]} | grep -ow "$1" | wc -w)
