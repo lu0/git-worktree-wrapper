@@ -2,8 +2,8 @@
 
 Wrapper script to easily execute common git-worktree commands.
 
-This script works kind of like a pre hook for checkout/switch/branch to
-create, switch and delete worktrees by using only widely known commands.
+This script works kind of like a pre hook for checkout/branch to
+create, checkout and delete worktrees by using only widely known commands.
 
 - [git-worktree-wrapper](#git-worktree-wrapper)
   - [Installation](#installation)

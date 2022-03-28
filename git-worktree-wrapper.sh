@@ -15,7 +15,7 @@ alias git_=$(which git)
 clean_env() {
     unalias git_
     unset is_bare bare_dir
-    unset git_switch_cmds override_switch_cmds
+    unset git_checkout_cmds override_checkout_cmds
     unset git_branch_cmds override_branch_cmds
     unset to to_dir from
     unset cmd 
@@ -32,13 +32,13 @@ fi
 
 bare_dir=$(git_ worktree list | head -1 | cut -d" " -f1)
 
-git_switch_cmds=("checkout switch")
-override_switch_cmds=$(echo ${git_switch_cmds[@]} | grep -ow "$1" | wc -w)
+git_checkout_cmds=("checkout")
+override_checkout_cmds=$(echo ${git_checkout_cmds[@]} | grep -ow "$1" | wc -w)
 
 git_branch_cmds=("branch")
 override_branch_cmds=$(echo ${git_branch_cmds[@]} | grep -ow "$1" | wc -w)
 
-if [[ "${override_switch_cmds}" = 0 ]] && [[ "${override_branch_cmds}" = 0 ]]; then
+if [[ "${override_checkout_cmds}" = 0 ]] && [[ "${override_branch_cmds}" = 0 ]]; then
     # Return original git command to enable autocompletion
     git_ "$@"
     clean_env && return 1
@@ -48,7 +48,7 @@ show() {
     echo -e >&2 "git-worktree-wrapper:\n  ${1}"
 }
 
-if [[ "${override_switch_cmds}" = 1 ]]; then
+if [[ "${override_checkout_cmds}" = 1 ]]; then
 
     if [[ "$2" == "-b" || "$2" == "-B" ]]; then
         # Create new branch/worktree ------------------------------------------
@@ -56,7 +56,7 @@ if [[ "${override_switch_cmds}" = 1 ]]; then
         # Use `.` instead of `/` for directories of subbranches
         to_dir=$(echo "${3}" | sed s,\/,.,g)
 
-        # Replace `git_switch_cmds` with `worktree add`,
+        # Replace `git_checkout_cmds` with `worktree add`,
         # set `from` if not passed as argument,
         # and specify the path in which the new branch is going to be stored.
         if [[ "${4}" ]]; then
