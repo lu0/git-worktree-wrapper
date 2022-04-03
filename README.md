@@ -1,31 +1,40 @@
-# git-worktree-wrapper
+`git-worktree-wrapper`
+---
 
-Wrapper script to easily execute common git-worktree commands.
+This wrapper script features an API for `git-worktree` commands
+in order to easily create, switch and delete worktrees and branches of bare
+repositories using widely known commands: `git checkout` and `git branch`.
 
-This script works kind of like a pre hook for checkout/branch to
-create, checkout and delete worktrees by using only widely known commands.
+Quiet built-in checkouts are made after each overridden checkout to trigger
+post-checkout hooks.
 
-- [git-worktree-wrapper](#git-worktree-wrapper)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Configure default editor](#configure-default-editor)
-    - [Clone a bare repository](#clone-a-bare-repository)
-    - [Setup fetch to remote](#setup-fetch-to-remote)
-    - [Create initial worktree](#create-initial-worktree)
-    - [Create a new branch/worktree](#create-a-new-branchworktree)
-    - [Open an existing worktree](#open-an-existing-worktree)
-    - [Delete a branch/worktree](#delete-a-branchworktree)
 
-## Installation
+Table of Contents
+---
 
-Clone this repository, try with a bare clone!
+- [Installation](#installation)
+- [Setup](#setup)
+  - [Configure your default editor](#configure-your-default-editor)
+  - [Clone a bare repository](#clone-a-bare-repository)
+  - [Setup fetch rules to the remote](#setup-fetch-rules-to-the-remote)
+- [Usage](#usage)
+  - [Open an existing branch or worktree](#open-an-existing-branch-or-worktree)
+    - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree)
+  - [Create a new branch or worktree](#create-a-new-branch-or-worktree)
+    - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree-1)
+  - [Delete a branch and its worktree](#delete-a-branch-and-its-worktree)
+    - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree-2)
+
+# Installation
+
+Clone this repository
 
 ```sh
 git clone https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper
 ```
 
-Add the `git-wrapper-script` to your local `PATH`
+Link `git-wrapper-script` to your local `PATH`
 
 ```sh
 ln -srf git-worktree-wrapper.sh ~/.local/bin/git-worktree-wrapper
@@ -51,9 +60,10 @@ _complete_alias_overrides() {
 }
 ```
 
-## Usage
 
-### Configure default editor
+# Setup
+
+## Configure your default editor
 
 Set the environment variable `EDITOR` in your `~/.bashrc`,
 `git-worktree-wrapper` will try to open worktree directories using this editor.
@@ -63,50 +73,107 @@ Set the environment variable `EDITOR` in your `~/.bashrc`,
 export EDITOR=code
 ```
 
-Or set `NO_GIT_WORKTREE_EDITOR=1` to disable usage of editors.
+Or set `DISABLE_GIT_WORKTREE_EDITOR=1` to disable usage of editors.
 
 ```sh
-export NO_GIT_WORKTREE_EDITOR=1
+export DISABLE_GIT_WORKTREE_EDITOR=1
 ```
 
-### Clone a bare repository
+## Clone a bare repository
 
-Try with this repo!
+Try it with this repo!
 
 ```sh
 git clone --bare https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper.git
 ```
 
-### Setup fetch to remote
+## Setup fetch rules to the remote
 
 ```sh
 git config --local remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 git fetch
 ```
 
-### Create initial worktree
 
-```sh
-git checkout -B $(git branch --show-current)
-```
+# Usage
 
-### Create a new branch/worktree
+After cloning a bare repository, you can use the following common `git checkout` and
+`git branch` commands.
 
-```sh
-git checkout [-b|-B] another_branch
-```
+## Open an existing branch or worktree
 
-### Open an existing worktree
+Switch to branch `master` and *cd* into its worktree, **even if you are *cd'd* into
+another worktree/branch**:
 
 ```sh
 git checkout master
 ```
 
-### Delete a branch/worktree
+### Comparison with vanilla `git-worktree`
 
-This will remove both the branch and the worktree.
+Next commands should be issued to achieve the same functionality described above when
+`git-worktree-wrapper` is not installed:
+
+If the branch exists but the worktree doesn't.
+```language
+cd /path/to/the/root/of/the/bare/repository
+git worktree add master
+cd master
+```
+
+When the worktree exists:
+```sh
+cd /path/to/the/root/of/the/bare/repository
+cd master
+```
+
+## Create a new branch or worktree
+
+Create a branch `new_branch` and *cd* into its new worktree, **even if you are *cd'd* into
+another worktree/branch**:
 
 ```sh
-git branch [-d|-D] another_branch
+git checkout -b new_branch <from_branch (optional)>
+# or use -B to force reset
 ```
+
+### Comparison with vanilla `git-worktree`
+
+Next commands should be issued to achieve the same functionality described above when
+`git-worktree-wrapper` is not installed:
+
+When both the branch and worktree don't exist
+```language
+git branch new_branch
+cd /path/to/the/root/of/the/bare/repository
+git worktree add new_branch
+cd new_branch
+```
+
+When branch or worktree already exist and you want to reset it as 
+`git checkout -B` would do:
+```sh
+cd /path/to/the/root/of/the/bare/repository
+cd new_branch
+git checkout -B new_branch <from_branch (optional)>
+```
+
+## Delete a branch and its worktree
+
+Delete a branch and its worktree, **even if you are *cd'd* into the worktree/branch you want to delete**:
+```sh
+git branch -d new_branch # or -D to force removal
+```
+
+### Comparison with vanilla `git-worktree`
+
+Next commands should be issued to achieve the same functionality described above when
+`git-worktree-wrapper` is not installed:
+
+```sh
+cd /path/to/the/root/of/the/bare/repository
+git worktree remove new_branch
+git branch -d new_branch # or -D to force removal
+```
+

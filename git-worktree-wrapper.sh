@@ -1,142 +1,68 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# 
+#
 # git-worktree-wrapper
-# 
+#
 # Wrapper script to easily execute common git-worktree commands.
-# This script overrides git's checkout/switch/branch commands
-# when working on bare repositories (worktrees).
-# 
+# This script overrides git's checkout/branch commands
+# when working within bare repositories (worktrees).
+#
+# Quiet built-in checkouts are made after each overridden checkout
+# to trigger post-checkout hooks.
+#
 
-# Using an alias pointing to the binary to avoid
-# _complete_alias to get confused
-alias git_=$(which git)
 
-clean_env() {
-    unalias git_
-    unset is_bare bare_dir
-    unset git_checkout_cmds override_checkout_cmds
-    unset git_branch_cmds override_branch_cmds
-    unset to to_dir from
-    unset cmd 
+# shellcheck disable=SC2164
+set -uo pipefail
+
+
+gww::override_command() {
+    case "${1:-}" in
+        checkout)   checkout::override_commands "${@:-}" ;;
+        branch)     branch::override_commands "${@:-}" ;;
+        *)          utils::git "${@:-}" ;;
+    esac
 }
 
-is_git_repo=$(git_ branch --show-current 2> /dev/null | wc -w)
-is_bare=$(git_ config --get core.bare)
 
-if [[ "${is_bare}" = false ]] || [[ ${is_git_repo} = 0 ]]; then
-    # Return original git command to enable autocompletion
-    git_ "$@"
-    clean_env && return 1
-fi
+gww::main() {
+    local git_commands_to_override
+    local is_bare_repo is_overridable
 
-bare_dir=$(git_ worktree list | head -1 | cut -d" " -f1)
+    is_bare_repo=$(
+        utils::git config --local --get core.bare 2> /dev/null | grep -i true | wc -w
+    )
 
-git_checkout_cmds=("checkout")
-override_checkout_cmds=$(echo ${git_checkout_cmds[@]} | grep -ow "$1" | wc -w)
-
-git_branch_cmds=("branch")
-override_branch_cmds=$(echo ${git_branch_cmds[@]} | grep -ow "$1" | wc -w)
-
-if [[ "${override_checkout_cmds}" = 0 ]] && [[ "${override_branch_cmds}" = 0 ]]; then
-    # Return original git command to enable autocompletion
-    git_ "$@"
-    clean_env && return 1
-fi
-
-show() {
-    echo -e >&2 "git-worktree-wrapper:\n  ${1}"
+    if [[ "${is_bare_repo}" == 1 ]]; then
+        gww::override_command "${@:-}"
+    else
+        utils::git "${@:-}"
+    fi
 }
 
-if [[ "${override_checkout_cmds}" = 1 ]]; then
+gww::init() {
+    local script_real_dir
 
-    if [[ "$2" == "-b" || "$2" == "-B" ]]; then
-        # Create new branch/worktree ------------------------------------------
+    script_real_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-        # Use `.` instead of `/` for directories of subbranches
-        to_dir=$(echo "${3}" | sed s,\/,.,g)
-
-        # Replace `git_checkout_cmds` with `worktree add`,
-        # set `from` if not passed as argument,
-        # and specify the path in which the new branch is going to be stored.
-        if [[ "${4}" ]]; then
-            set -- "worktree add --track ${@:2:2} ${to_dir} ${@:4}"
-        else
-            from=$(git_ branch --show-current)
-            set -- "worktree add --track ${@:2:2} ${to_dir} ${from}"
-        fi
-
-        # Run from bare repo's dir
-        cd ${bare_dir}
-
-        cmd="git_ $@"
-        show "Executing vanilla command:\n\t${cmd}"
-        eval ${cmd}
-
-
-        # Open with default editor
-        cd ${to_dir} && [[ ${NO_GIT_WORKTREE_EDITOR} != 1 ]] && ${EDITOR} .
-
-    else 
-        # Open existing branch/worktree -----------------------------------
-
-        to="${2}"
-        if [[ "${to}" == "." ]]; then
-            to_branch_count=0
-        else
-            to_branch_count=$(git branch | grep -w "${to}" | wc -l)
-        fi
-        checking_branch=$(( ${to_branch_count} >= 1 ))
-
-        if [[ "${checking_branch}" = 0 ]]; then 
-            # Run original git command
-            git_ "$@"
-
-        else
-            # Use `.` instead of `/` for directories of subbranches
-            to_dir=$(echo "${to}" | sed s,\/,.,g)
-
-            if [[ $(git_ worktree list | grep -w "\[${to}\]") ]]; then
-
-                cmd="cd ${bare_dir}/${to_dir} && [[ ${NO_GIT_WORKTREE_EDITOR} != 1 ]] && ${EDITOR} ."
-                show "Executing vanilla command:\n\t${cmd}"
-                eval ${cmd}
-
-            else
-                show "Worktree ${to_dir} does not exist."
-                cd -
-            fi
-        fi
-    fi
-    
-elif [[ "${override_branch_cmds}" = 1 ]]; then
-
-    if [[ "$2" == "-d" || "$2" == "-D" ]]; then
-        # Delete worktree before deleting branch ------------------------------
-
-        # Use `.` instead of `/` for directories of subbranches
-        to_dir=$(echo "${3}" | sed s,\/,.,g)
-
-        if [[ "$2" == "-d" ]]; then
-            # Soft remove
-            cmd="git_ worktree remove ${to_dir}"
-        else
-            # Force removal
-            cmd="git_ worktree remove -f ${to_dir}"
-        fi
-
-        # Run from bare repo's dir
-        cd ${bare_dir}
-
-        show "Executing vanilla command:\n\t${cmd}"
-        eval ${cmd}
-
+    if [ "$0" == "${BASH_SOURCE[0]}" ]; then
+        echo "git-worktree-wrapper must be sourced instead of executed."
+        exit 1
     fi
 
-    # Delete branch or run original branch command ----------------------------
-    git_ "$@"
+    # Load libraries
+    # shellcheck source=libs/_init_libs.sh
+    source "${script_real_dir}/libs/_init_libs.sh"
+}
 
-fi
 
-show "Last checked out branch: $(cat ${bare_dir}/.currentbranch)"
-clean_env && return 0
+trap 'break' ERR;
+
+while true; do
+    gww::init
+    gww::main "${@:-}"
+    break
+done
+
+trap - ERR
+set +u +o pipefail
