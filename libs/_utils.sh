@@ -34,7 +34,7 @@ utils::get_bare_dir() {
 
 # Open directory in the preferred editor (if set and enabled)
 utils::open_editor_in_current() {
-    if [[ ${EDITOR:-} ]] && [[ ${DISABLE_GIT_WORKTREE_EDITOR:-} != 1 ]]; then
+    if [[ "${EDITOR:-}" ]] && [[ "${DISABLE_GIT_WORKTREE_EDITOR:-}" != "1" ]]; then
         utils::info "Opening in editor: ${EDITOR:-}"
         ${EDITOR:-} .
     fi

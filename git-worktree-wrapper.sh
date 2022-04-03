@@ -26,8 +26,7 @@ gww::override_command() {
 
 
 gww::main() {
-    local git_commands_to_override
-    local is_bare_repo is_overridable
+    local is_bare_repo
 
     is_bare_repo=$(
         utils::git config --local --get core.bare 2> /dev/null | grep -i true | wc -w
