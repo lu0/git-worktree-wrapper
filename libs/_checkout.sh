@@ -112,7 +112,7 @@ checkout::_switch_to_branch_and_worktree() {
 # Vanilla git handles non-existence of the given branch.
 # Post-checkout hooks are disabled within this function.
 # - Call: `checkout::__create_worktree_from_branch "${branch}"`
-# - Returns: `worktree_dir` of the new or available worktree, returns
+# - Returns: Path to the created or existing worktree for `branch` or
 #             an empty string if the creation was not successful.
 checkout::__create_worktree_from_branch() {
     local to_dir
@@ -121,10 +121,9 @@ checkout::__create_worktree_from_branch() {
 
     bare_dir=$(utils::get_bare_dir)    
     to_dir=$(utils::branch_to_dir_name "${to}")
-    existing_worktree=$(utils::git worktree list | grep -w "\[${to}\]")
 
     # Create worktree if does not exist
-    if [ -z "${existing_worktree:-}" ]; then
+    if [ -z $(utils::get_branch_path "${to}") ]; then
         # Created in the directory of the bare repository
         cd "${bare_dir}"
 
@@ -136,8 +135,7 @@ checkout::__create_worktree_from_branch() {
         fi
     fi
 
-    # Return directory of existent worktree
-    utils::git worktree list | grep -w "\[${to}\]" | cut -d" " -f1
+    utils::get_branch_path "${to}"
 }
 
 

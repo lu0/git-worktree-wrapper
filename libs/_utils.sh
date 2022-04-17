@@ -20,10 +20,14 @@ utils::info() {
 }
 
 
-
 # Use `.` instead of `/` to name worktree directories
 utils::branch_to_dir_name() {
     echo "${1//'/'/'.'}"
+}
+
+
+utils::get_branch_path() {
+    utils::git worktree list | grep -w "\[${1}\]" | cut -d" " -f1
 }
 
 
