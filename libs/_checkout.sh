@@ -1,4 +1,7 @@
-#
+#!/usr/bin/env bash
+# shellcheck disable=SC2164
+
+# 
 # Functions to wrap git's checkout command in bare repositories
 #
 # Uses globals:
@@ -46,7 +49,7 @@ checkout::override_commands() {
 checkout::_create_branch_and_worktree() {
 
     local opt="${2:-}" to="${3:-}" from="${4:-}"
-    local to_dir existing_branch existing_worktree
+    local to_dir existing_branch
 
     if [ -z "${from:-}" ]; then
         # Use current branch as reference
@@ -116,14 +119,13 @@ checkout::_switch_to_branch_and_worktree() {
 #             an empty string if the creation was not successful.
 checkout::__create_worktree_from_branch() {
     local to_dir
-    local existing_worktree
     local bare_dir
 
     bare_dir=$(utils::get_bare_dir)
     to_dir=$(utils::branch_to_dir_name "${to}")
 
     # Create worktree if does not exist
-    if [ -z $(utils::get_branch_path "${to}") ]; then
+    if [ -z "$(utils::get_branch_path "${to}")" ]; then
         # Created in the directory of the bare repository
         cd "${bare_dir}"
 

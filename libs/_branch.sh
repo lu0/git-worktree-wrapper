@@ -1,7 +1,9 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2164
+
 #
 # Functions to wrap git's branch command in bare repositories
 #
-
 
 # Override branch commands. Triggered by:
 # > git branch ...
@@ -22,16 +24,15 @@ branch::override_commands() {
 # Delete worktree then branch
 branch::_delete_worktree_and_branch() {
     local opt="${2:-}" branch="${3:-}"
-    local to_dir cd_to_bare_dir worktree_abs_dir
-    local bare_dir
+    local cd_to_bare_dir=false
+    local bare_dir to_dir worktree_abs_dir
 
     bare_dir="$(utils::get_bare_dir)"
     to_dir=$(utils::branch_to_dir_name "${branch}")
-    cd_to_bare_dir=false
 
     worktree_abs_dir="${bare_dir%%/}/${to_dir}"
 
-    case "${2}" in
+    case "${opt}" in
         -d)
             # Soft remove
             utils::git worktree remove "${worktree_abs_dir}" 2> /dev/null \

@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2164
+
 #
 # Miscellaneous utilities
 #
@@ -37,15 +40,16 @@ utils::get_bare_dir() {
 
 
 utils::__store_last_checkedout() {
+    local branch worktree_path info
     branch=$(git branch --show-current)
-    worktree_path=$(utils::get_branch_path ${branch})
+    worktree_path=$(utils::get_branch_path "${branch}")
     info="${worktree_path}\t[${branch}]"
-    echo -e "${info}" > $(utils::get_bare_dir)/.lastcheckedout
+    echo -e "${info}" > "$(utils::get_bare_dir)"/.lastcheckedout
 }
 
 
 # Open the current worktree in a enabled and set editor and
-# store a reference to the worktree directory in the repository's roots
+# store a reference to the worktree directory in the repository's root
 utils::open_editor_and_store_reference() {
     if [[ "${EDITOR:-}" ]] && [[ "${DISABLE_GIT_WORKTREE_EDITOR:-}" != "1" ]]; then
         utils::info "Opening in editor: ${EDITOR:-}"
