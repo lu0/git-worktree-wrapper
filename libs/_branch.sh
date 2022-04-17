@@ -46,7 +46,7 @@ branch::_delete_worktree_and_branch() {
 
     if [ "${cd_to_bare_dir}" == true ]; then
         cd "${bare_dir}"
-        utils::open_editor_in_current
+        utils::open_editor_and_store_reference
     fi
 
     # Let vanilla git handle removal of the branch

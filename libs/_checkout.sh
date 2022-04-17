@@ -1,6 +1,6 @@
-# 
+#
 # Functions to wrap git's checkout command in bare repositories
-# 
+#
 # Uses globals:
 #   BARE_DIR
 
@@ -82,7 +82,7 @@ checkout::_create_branch_and_worktree() {
             checkout::__trigger_post_hook
         fi
 
-        utils::open_editor_in_current
+        utils::open_editor_and_store_reference
     fi
 }
 
@@ -97,12 +97,12 @@ checkout::_switch_to_branch_and_worktree() {
 
     # Create worktree if does not exist
     worktree_dir=$(checkout::__create_worktree_from_branch "${to}")
-    
+
     if [ -d "${worktree_dir:-}" ]; then
         # If successful, cd to the created worktree
         cd "${worktree_dir}"
         checkout::__trigger_post_hook
-        utils::open_editor_in_current
+        utils::open_editor_and_store_reference
     fi
 }
 
@@ -119,7 +119,7 @@ checkout::__create_worktree_from_branch() {
     local existing_worktree
     local bare_dir
 
-    bare_dir=$(utils::get_bare_dir)    
+    bare_dir=$(utils::get_bare_dir)
     to_dir=$(utils::branch_to_dir_name "${to}")
 
     # Create worktree if does not exist
