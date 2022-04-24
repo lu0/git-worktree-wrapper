@@ -51,11 +51,6 @@ checkout::_create_branch_and_worktree() {
     local opt="${2:-}" to="${3:-}" from="${4:-}"
     local to_dir existing_branch
 
-    if [ -z "${from:-}" ]; then
-        # Use current branch as reference
-        from=$(utils::git branch --show-current)
-    fi
-
     to_dir=$(utils::branch_to_dir_name "${to}")
     existing_branch=$(utils::git branch --list "${to}")
 
@@ -67,7 +62,8 @@ checkout::_create_branch_and_worktree() {
     else
         # Create branch if does not exist
         if [ -z "${existing_branch:-}" ]; then
-            utils::git branch "${to}" "${from}"
+            # shellcheck disable=SC2086
+            utils::git branch "${to}" ${from}
         fi
 
         # Create worktree if does not exist
@@ -79,7 +75,8 @@ checkout::_create_branch_and_worktree() {
         if [ "${opt}" == "-B" ]; then
             # Let git handle resets. Vanilla checkouts
             # always trigger post-checkout hooks.
-            utils::git checkout -B "${to}" "${from}"
+            # shellcheck disable=SC2086
+            utils::git checkout -B "${to}" ${from}
         else
             # Trigger post-checkout hooks
             checkout::__trigger_post_hook
