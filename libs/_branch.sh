@@ -28,7 +28,7 @@ branch::_delete_worktree_and_branch() {
     local bare_dir to_dir worktree_abs_dir
 
     bare_dir="$(utils::get_bare_dir)"
-    to_dir=$(utils::branch_to_ref_name "${branch}")
+    to_dir=$(utils::ref_to_dir_name "${branch}")
 
     worktree_abs_dir="${bare_dir%%/}/${to_dir}"
 
