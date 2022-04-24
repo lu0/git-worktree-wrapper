@@ -13,6 +13,8 @@ Table of Contents
 ---
 
 - [Installation](#installation)
+  - [Wrapper script](#wrapper-script)
+  - [Completion rules](#completion-rules)
 - [Setup](#setup)
   - [Configure your default editor](#configure-your-default-editor)
   - [Clone a bare repository](#clone-a-bare-repository)
@@ -27,6 +29,8 @@ Table of Contents
 
 # Installation
 
+## Wrapper script
+
 Clone this repository
 
 ```sh
@@ -40,7 +44,25 @@ Link `git-wrapper-script` to your local `PATH`
 ln -srf git-worktree-wrapper.sh ~/.local/bin/git-worktree-wrapper
 ```
 
-Install [my modified fork of complete_alias](https://github.com/lu0/complete-alias).
+Add the following to your `~/.bashrc` or `~/.bash_aliases`
+
+```sh
+alias git="source git-worktree-wrapper"
+```
+
+Restart your terminal or re-run bash
+
+```sh
+bash
+```
+
+## Completion rules
+
+Check if your current completion rules autocomplete `git` after installing
+the wrapper script. Try `git checko` + <kbd>TAB</kbd>
+
+If your git commands are no longer autocompleted, install
+[my modified fork of complete_alias](https://github.com/lu0/complete-alias).
 
 ```sh
 sudo apt install bash-completion
