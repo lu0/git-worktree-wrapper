@@ -15,11 +15,10 @@ Table of Contents
 - [Installation](#installation)
   - [Wrapper script](#wrapper-script)
   - [Completion rules](#completion-rules)
-- [Setup](#setup)
-  - [Configure your default editor](#configure-your-default-editor)
-  - [Clone a bare repository](#clone-a-bare-repository)
-  - [Setup fetch rules to the remote](#setup-fetch-rules-to-the-remote)
+  - [Setup default editor](#setup-default-editor)
 - [Usage](#usage)
+  - [Clone and setup a bare repository](#clone-and-setup-a-bare-repository)
+    - [Setup fetch rules from the remote](#setup-fetch-rules-from-the-remote)
   - [Open an existing branch or worktree](#open-an-existing-branch-or-worktree)
     - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree)
   - [Create a new branch or worktree](#create-a-new-branch-or-worktree)
@@ -83,9 +82,7 @@ _complete_alias_overrides() {
 ```
 
 
-# Setup
-
-## Configure your default editor
+## Setup default editor
 
 Set the environment variable `EDITOR` in your `~/.bashrc`,
 `git-worktree-wrapper` will try to open worktree directories using this editor.
@@ -101,27 +98,23 @@ Or set `DISABLE_GIT_WORKTREE_EDITOR=1` to disable usage of editors.
 export DISABLE_GIT_WORKTREE_EDITOR=1
 ```
 
-## Clone a bare repository
+# Usage
 
-Try it with this repo!
+## Clone and setup a bare repository
+
+Try with this repo!
 
 ```sh
 git clone --bare https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper.git
 ```
 
-## Setup fetch rules to the remote
+### Setup fetch rules from the remote
 
 ```sh
 git config --local remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 git fetch
 ```
-
-
-# Usage
-
-After cloning a bare repository, you can use the following common `git checkout` and
-`git branch` commands.
 
 ## Open an existing branch or worktree
 
