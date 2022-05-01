@@ -2,8 +2,8 @@
 ---
 
 This wrapper script features an API for `git-worktree` commands
-in order to easily create, switch and delete worktrees and branches of bare
-repositories using widely known commands: `git checkout` and `git branch`.
+in order to easily create, switch and delete worktrees of bare repositories
+using commands you already know: `git checkout` and `git branch`.
 
 Quiet built-in checkouts are made after each overridden checkout to trigger
 post-checkout hooks.
@@ -19,7 +19,7 @@ Table of Contents
 - [Usage](#usage)
   - [Clone and setup a bare repository](#clone-and-setup-a-bare-repository)
     - [Setup fetch rules from the remote](#setup-fetch-rules-from-the-remote)
-  - [Open an existing branch or worktree](#open-an-existing-branch-or-worktree)
+  - [Open an existing branch, tag or worktree](#open-an-existing-branch-tag-or-worktree)
     - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree)
   - [Create a new branch or worktree](#create-a-new-branch-or-worktree)
     - [Comparison with vanilla `git-worktree`](#comparison-with-vanilla-git-worktree-1)
@@ -116,21 +116,28 @@ git config --local remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 git fetch
 ```
 
-## Open an existing branch or worktree
+## Open an existing branch, tag or worktree
 
-Switch to branch `master` and *cd* into its worktree, **even if you are *cd'd* into
-another worktree/branch**:
+Switch to **branch** `master`:
 
 ```sh
 git checkout master
 ```
+
+You can also switch to an existing **tag**:
+```sh
+git checkout v1.0.0
+```
+
+The script will automatically create the worktree, if it does not exist, and *cd*
+into it, **even if you are *cd'd* into another worktree/branch/tag**:
 
 ### Comparison with vanilla `git-worktree`
 
 Next commands should be issued to achieve the same functionality described above when
 `git-worktree-wrapper` is not installed:
 
-If the branch exists but the worktree doesn't.
+If the branch/tag exists but the worktree doesn't.
 ```language
 cd /path/to/the/root/of/the/bare/repository
 git worktree add master
@@ -145,13 +152,15 @@ cd master
 
 ## Create a new branch or worktree
 
-Create a branch `new_branch` and *cd* into its new worktree, **even if you are *cd'd* into
-another worktree/branch**:
+To create a new branch, just issue the command you already know:
 
 ```sh
 git checkout -b new_branch <from_branch (optional)>
 # or use -B to force reset
 ```
+
+The script will automatically create a new worktree and *cd* into it,
+**even if you are *cd'd* into another worktree/branch/tag**:
 
 ### Comparison with vanilla `git-worktree`
 
@@ -176,10 +185,17 @@ git checkout -B new_branch <from_branch (optional)>
 
 ## Delete a branch and its worktree
 
-Delete a branch and its worktree, **even if you are *cd'd* into the worktree/branch you want to delete**:
+To delete a branch, just issue the command you already use for
+"normal" repositories:
+
 ```sh
 git branch -d new_branch # or -D to force removal
 ```
+
+The script will **delete both** the branch and its worktree.
+
+If you are *cd'd* into the worktree/branch you are deleting, the script will
+*cd* you into the root directory of the bare repository.
 
 ### Comparison with vanilla `git-worktree`
 

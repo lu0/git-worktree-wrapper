@@ -22,12 +22,14 @@ utils::git() {
 # this enables detached checkouts to commits within a worktree.
 utils::is_worktreable() {
     local ref="${1}"
-    local is_branch is_tag
+    local is_local_branch is_remote_branch is_tag
+    local cmd="utils::git show-ref --verify -q"
+    
+    is_local_branch=$(${cmd} refs/heads/"${ref}" && echo 1)
+    is_remote_branch=$(${cmd} refs/remotes/origin/"${ref}" && echo 1)
+    is_tag=$(${cmd} refs/tags/"${ref}" && echo 1)
 
-    is_branch=$(utils::git show-ref --verify -q refs/heads/"${ref}" && echo 1)
-    is_tag=$(utils::git show-ref --verify -q refs/tags/"${ref}" && echo 1)
-
-    if [[ "${is_tag}" == 1 ]] || [[ "${is_branch}" == 1 ]]; then
+    if [[ "${is_tag}${is_local_branch}${is_remote_branch}" ]]; then
         echo 1
     fi
 }
