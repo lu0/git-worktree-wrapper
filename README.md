@@ -61,13 +61,14 @@ Check if your current completion rules autocomplete `git` after installing
 the wrapper script. Try `git checko` + <kbd>TAB</kbd>
 
 If your git commands are no longer autocompleted, install
-[my modified fork of complete_alias](https://github.com/lu0/complete-alias).
+[complete_alias@3fc67e8](https://github.com/cykerway/complete-alias/tree/3fc67e8).
 
 ```sh
 sudo apt install bash-completion
-git clone https://github.com/lu0/complete-alias
-cd complete-alias/
-echo ". $PWD/complete_alias" >> ~/.bash_completion
+git clone https://github.com/cykerway/complete-alias ~/.complete-alias
+cd ~/.complete-alias
+git checkout 3fc67e8
+echo ". ${PWD}/complete_alias" >> ~/.bash_completion
 ```
 
 Inherit `git`'s completion rules by pasting the following in your `~/.bashrc` or
@@ -76,8 +77,17 @@ Inherit `git`'s completion rules by pasting the following in your `~/.bashrc` or
 ```sh
 alias git="source git-worktree-wrapper"
 complete -F _complete_alias git
-_complete_alias_overrides() {
-    echo git git
+
+__compal__get_alias_body() {
+    local cmd="$1"
+    local body; body="$(alias "$cmd")"
+
+    # Overrides
+    case "$cmd" in
+        "git") body="git"
+    esac
+
+    echo "${body#*=}" | command xargs
 }
 ```
 
