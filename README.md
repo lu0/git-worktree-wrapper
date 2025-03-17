@@ -33,14 +33,14 @@ Table of Contents
 Clone this repository
 
 ```sh
-git clone https://github.com/lu0/git-worktree-wrapper
+\git clone https://github.com/lu0/git-worktree-wrapper
 cd git-worktree-wrapper
 ```
 
 Link `git-wrapper-script` to your local `PATH`
 
 ```sh
-ln -srf git-worktree-wrapper.sh ~/.local/bin/git-worktree-wrapper
+mkdir -p ~/.local/bin && ln -srf git-worktree-wrapper.sh ~/.local/bin/git-worktree-wrapper
 ```
 
 Add the following to your `~/.bashrc` or `~/.bash_aliases`
